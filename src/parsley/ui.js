@@ -146,11 +146,8 @@ UI.Field = {
   },
 
   _manageStatusClass: function () {
-    if (this.hasConstraints() && this.needsValidation() && true === this.validationResult)
+    if (this.needsValidation() && true === this.validationResult)
       this._successClass();
-    else if (!this.needsValidation() && true === this.validationResult){
-      this._successClass();
-    }
     else if (this.validationResult.length > 0)
       this._errorClass();
     else
