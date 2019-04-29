@@ -187,8 +187,8 @@ Field.prototype = {
   },
 
   // Reset UI
-  reset: function () {
-    this._resetUI();
+  reset: function (resetClass) {
+    this._resetUI(resetClass);
     return this._trigger('reset');
   },
 
