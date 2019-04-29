@@ -1,5 +1,5 @@
 {
-  "name": "parsleyjs",
+  "name": "@doorr/parsleyjs",
   "version": "2.9.2",
   "homepage": "http://parsleyjs.org",
   "license": "MIT",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/guillaumepotier/Parsley.js.git"
+    "url": "https://github.com/Moregidge/Parsley.js"
   },
   "keywords": [
     "parsley",
