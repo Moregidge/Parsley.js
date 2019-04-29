@@ -1,5 +1,5 @@
-import $ from 'jquery';
-import Utils from './utils';
+import $ from "jquery";
+import Utils from "./utils";
 
 var UI = {};
 
@@ -16,71 +16,73 @@ var diffResults = function (newResult, oldResult, deep) {
         break;
       }
 
-    if (found)
-      kept.push(newResult[i]);
-    else
-      added.push(newResult[i]);
+    if (found) kept.push(newResult[i]);
+    else added.push(newResult[i]);
   }
 
   return {
     kept: kept,
     added: added,
-    removed: !deep ? diffResults(oldResult, newResult, true).added : []
+    removed: !deep ? diffResults(oldResult, newResult, true).added : [],
   };
 };
 
 UI.Form = {
-
   _actualizeTriggers: function () {
-    this.$element.on('submit.Parsley', evt => { this.onSubmitValidate(evt); });
-    this.$element.on('click.Parsley', Utils._SubmitSelector, evt => { this.onSubmitButton(evt); });
+    this.$element.on("submit.Parsley", (evt) => {
+      this.onSubmitValidate(evt);
+    });
+    this.$element.on("click.Parsley", Utils._SubmitSelector, (evt) => {
+      this.onSubmitButton(evt);
+    });
 
     // UI could be disabled
-    if (false === this.options.uiEnabled)
-      return;
+    if (false === this.options.uiEnabled) return;
 
-    this.element.setAttribute('novalidate', '');
+    this.element.setAttribute("novalidate", "");
   },
 
   focus: function () {
     this._focusedField = null;
 
-    if (true === this.validationResult || 'none' === this.options.focus)
+    if (true === this.validationResult || "none" === this.options.focus)
       return null;
 
     for (var i = 0; i < this.fields.length; i++) {
       var field = this.fields[i];
-      if (true !== field.validationResult && field.validationResult.length > 0 && 'undefined' === typeof field.options.noFocus) {
+      if (
+        true !== field.validationResult &&
+        field.validationResult.length > 0 &&
+        "undefined" === typeof field.options.noFocus
+      ) {
         this._focusedField = field.$element;
-        if ('first' === this.options.focus)
-          break;
+        if ("first" === this.options.focus) break;
       }
     }
 
-    if (null === this._focusedField)
-      return null;
+    if (null === this._focusedField) return null;
 
     return this._focusedField.focus();
   },
 
   _destroyUI: function () {
     // Reset all event listeners
-    this.$element.off('.Parsley');
-  }
-
+    this.$element.off(".Parsley");
+  },
 };
 
 UI.Field = {
-
   _reflowUI: function () {
     this._buildUI();
 
     // If this field doesn't have an active UI don't bother doing something
-    if (!this._ui)
-      return;
+    if (!this._ui) return;
 
     // Diff between two validation results
-    var diff = diffResults(this.validationResult, this._ui.lastValidationResult);
+    var diff = diffResults(
+      this.validationResult,
+      this._ui.lastValidationResult
+    );
 
     // Then store current validation result for next reflow
     this._ui.lastValidationResult = this.validationResult;
@@ -104,87 +106,88 @@ UI.Field = {
   // Returns an array of field's error message(s)
   getErrorsMessages: function () {
     // No error message, field is valid
-    if (true === this.validationResult)
-      return [];
+    if (true === this.validationResult) return [];
 
     var messages = [];
 
     for (var i = 0; i < this.validationResult.length; i++)
-      messages.push(this.validationResult[i].errorMessage ||
-       this._getErrorMessage(this.validationResult[i].assert));
+      messages.push(
+        this.validationResult[i].errorMessage ||
+          this._getErrorMessage(this.validationResult[i].assert)
+      );
 
     return messages;
   },
 
   // It's a goal of Parsley that this method is no longer required [#1073]
-  addError: function (name, {message, assert, updateClass = true} = {}) {
+  addError: function (name, { message, assert, updateClass = true } = {}) {
     this._buildUI();
-    this._addError(name, {message, assert});
+    this._addError(name, { message, assert });
 
-    if (updateClass)
-      this._errorClass();
+    if (updateClass) this._errorClass();
   },
 
   // It's a goal of Parsley that this method is no longer required [#1073]
-  updateError: function (name, {message, assert, updateClass = true} = {}) {
+  updateError: function (name, { message, assert, updateClass = true } = {}) {
     this._buildUI();
-    this._updateError(name, {message, assert});
+    this._updateError(name, { message, assert });
 
-    if (updateClass)
-      this._errorClass();
+    if (updateClass) this._errorClass();
   },
 
   // It's a goal of Parsley that this method is no longer required [#1073]
-  removeError: function (name, {updateClass = true} = {}) {
+  removeError: function (name, { updateClass = true } = {}) {
     this._buildUI();
     this._removeError(name);
 
     // edge case possible here: remove a standard Parsley error that is still failing in this.validationResult
     // but highly improbable cuz' manually removing a well Parsley handled error makes no sense.
-    if (updateClass)
-      this._manageStatusClass();
+    if (updateClass) this._manageStatusClass();
   },
 
   _manageStatusClass: function () {
     if (this.needsValidation() && true === this.validationResult)
       this._successClass();
-    else if (this.validationResult.length > 0)
-      this._errorClass();
-    else
-      this._resetClass();
+    else if (this.validationResult.length > 0) this._errorClass();
+    else this._resetClass();
   },
 
   _manageErrorsMessages: function (diff) {
-    if ('undefined' !== typeof this.options.errorsMessagesDisabled)
-      return;
+    if ("undefined" !== typeof this.options.errorsMessagesDisabled) return;
 
     // Case where we have errorMessage option that configure an unique field error message, regardless failing validators
-    if ('undefined' !== typeof this.options.errorMessage) {
-      if ((diff.added.length || diff.kept.length)) {
+    if ("undefined" !== typeof this.options.errorMessage) {
+      if (diff.added.length || diff.kept.length) {
         this._insertErrorWrapper();
 
-        if (0 === this._ui.$errorsWrapper.find('.parsley-custom-error-message').length)
-          this._ui.$errorsWrapper
-            .append(
-              $(this.options.errorTemplate)
-              .addClass('parsley-custom-error-message')
-            );
+        if (
+          0 ===
+          this._ui.$errorsWrapper.find(".parsley-custom-error-message").length
+        )
+          this._ui.$errorsWrapper.append(
+            $(this.options.errorTemplate).addClass(
+              "parsley-custom-error-message"
+            )
+          );
 
-        this._ui.$errorClassHandler.attr('aria-describedby', this._ui.errorsWrapperId);
+        this._ui.$errorClassHandler.attr(
+          "aria-describedby",
+          this._ui.errorsWrapperId
+        );
 
         return this._ui.$errorsWrapper
-          .addClass('filled')
-          .attr('aria-hidden', 'false')
-          .find('.parsley-custom-error-message')
+          .addClass("filled")
+          .attr("aria-hidden", "false")
+          .find(".parsley-custom-error-message")
           .html(this.options.errorMessage);
       }
 
-      this._ui.$errorClassHandler.removeAttr('aria-describedby');
+      this._ui.$errorClassHandler.removeAttr("aria-describedby");
 
       return this._ui.$errorsWrapper
-        .removeClass('filled')
-        .attr('aria-hidden', 'true')
-        .find('.parsley-custom-error-message')
+        .removeClass("filled")
+        .attr("aria-hidden", "true")
+        .find(".parsley-custom-error-message")
         .remove();
     }
 
@@ -193,70 +196,85 @@ UI.Field = {
       this._removeError(diff.removed[i].assert.name);
 
     for (i = 0; i < diff.added.length; i++)
-      this._addError(diff.added[i].assert.name, {message: diff.added[i].errorMessage, assert: diff.added[i].assert});
+      this._addError(diff.added[i].assert.name, {
+        message: diff.added[i].errorMessage,
+        assert: diff.added[i].assert,
+      });
 
     for (i = 0; i < diff.kept.length; i++)
-      this._updateError(diff.kept[i].assert.name, {message: diff.kept[i].errorMessage, assert: diff.kept[i].assert});
+      this._updateError(diff.kept[i].assert.name, {
+        message: diff.kept[i].errorMessage,
+        assert: diff.kept[i].assert,
+      });
   },
 
-
-  _addError: function (name, {message, assert}) {
+  _addError: function (name, { message, assert }) {
     this._insertErrorWrapper();
-    this._ui.$errorClassHandler
-      .attr('aria-describedby', this._ui.errorsWrapperId);
+    this._ui.$errorClassHandler.attr(
+      "aria-describedby",
+      this._ui.errorsWrapperId
+    );
     this._ui.$errorsWrapper
-      .addClass('filled')
-      .attr('aria-hidden', 'false')
+      .addClass("filled")
+      .attr("aria-hidden", "false")
       .append(
         $(this.options.errorTemplate)
-        .addClass('parsley-' + name)
-        .html(message || this._getErrorMessage(assert))
+          .addClass("parsley-" + name)
+          .html(message || this._getErrorMessage(assert))
       );
   },
 
-  _updateError: function (name, {message, assert}) {
+  _updateError: function (name, { message, assert }) {
     this._ui.$errorsWrapper
-      .addClass('filled')
-      .find('.parsley-' + name)
+      .addClass("filled")
+      .find(".parsley-" + name)
       .html(message || this._getErrorMessage(assert));
   },
 
   _removeError: function (name) {
-    this._ui.$errorClassHandler
-      .removeAttr('aria-describedby');
+    this._ui.$errorClassHandler.removeAttr("aria-describedby");
     this._ui.$errorsWrapper
-      .removeClass('filled')
-      .attr('aria-hidden', 'true')
-      .find('.parsley-' + name)
+      .removeClass("filled")
+      .attr("aria-hidden", "true")
+      .find(".parsley-" + name)
       .remove();
   },
 
   _getErrorMessage: function (constraint) {
-    var customConstraintErrorMessage = constraint.name + 'Message';
+    var customConstraintErrorMessage = constraint.name + "Message";
 
-    if ('undefined' !== typeof this.options[customConstraintErrorMessage])
-      return window.Parsley.formatMessage(this.options[customConstraintErrorMessage], constraint.requirements);
+    if ("undefined" !== typeof this.options[customConstraintErrorMessage])
+      return window.Parsley.formatMessage(
+        this.options[customConstraintErrorMessage],
+        constraint.requirements
+      );
 
     return window.Parsley.getErrorMessage(constraint);
   },
 
   _buildUI: function () {
     // UI could be already built or disabled
-    if (this._ui || false === this.options.uiEnabled)
-      return;
+    if (this._ui || false === this.options.uiEnabled) return;
 
     var _ui = {};
 
     // Give field its Parsley id in DOM
-    this.element.setAttribute(this.options.namespace + 'id', this.__id__);
+    this.element.setAttribute(this.options.namespace + "id", this.__id__);
 
     /** Generate important UI elements and store them in this **/
     // $errorClassHandler is the $element that woul have parsley-error and parsley-success classes
     _ui.$errorClassHandler = this._manageClassHandler();
 
     // $errorsWrapper is a div that would contain the various field errors, it will be appended into $errorsContainer
-    _ui.errorsWrapperId = 'parsley-id-' + (this.options.multiple ? 'multiple-' + this.options.multiple : this.__id__);
-    _ui.$errorsWrapper = $(this.options.errorsWrapper).attr('id', _ui.errorsWrapperId);
+    _ui.errorsWrapperId =
+      "parsley-id-" +
+      (this.options.multiple
+        ? "multiple-" + this.options.multiple
+        : this.__id__);
+    _ui.$errorsWrapper = $(this.options.errorsWrapper).attr(
+      "id",
+      _ui.errorsWrapperId
+    );
 
     // ValidationResult UI storage to detect what have changed bwt two validations, and update DOM accordingly
     _ui.lastValidationResult = [];
@@ -269,34 +287,47 @@ UI.Field = {
   // Determine which element will have `parsley-error` and `parsley-success` classes
   _manageClassHandler: function () {
     // Class handled could also be determined by function given in Parsley options
-    if ('string' === typeof this.options.classHandler && $(this.options.classHandler).length)
+    if (
+      "string" === typeof this.options.classHandler &&
+      $(this.options.classHandler).length
+    )
       return $(this.options.classHandler);
 
     // Class handled could also be determined by function given in Parsley options
     var $handlerFunction = this.options.classHandler;
 
     // It might also be the function name of a global function
-    if ('string' === typeof this.options.classHandler && 'function' === typeof window[this.options.classHandler])
+    if (
+      "string" === typeof this.options.classHandler &&
+      "function" === typeof window[this.options.classHandler]
+    )
       $handlerFunction = window[this.options.classHandler];
 
-    if ('function' === typeof $handlerFunction) {
+    if ("function" === typeof $handlerFunction) {
       var $handler = $handlerFunction.call(this, this);
 
       // If this function returned a valid existing DOM element, go for it
-      if ('undefined' !== typeof $handler && $handler.length)
-        return $handler;
-    } else if ('object' === typeof $handlerFunction && $handlerFunction instanceof jQuery && $handlerFunction.length) {
+      if ("undefined" !== typeof $handler && $handler.length) return $handler;
+    } else if (
+      "object" === typeof $handlerFunction &&
+      $handlerFunction instanceof jQuery &&
+      $handlerFunction.length
+    ) {
       return $handlerFunction;
     } else if ($handlerFunction) {
-      Utils.warn('The class handler `' + $handlerFunction + '` does not exist in DOM nor as a global JS function');
+      Utils.warn(
+        "The class handler `" +
+          $handlerFunction +
+          "` does not exist in DOM nor as a global JS function"
+      );
     }
 
     return this._inputHolder();
   },
 
-  _inputHolder: function() {
+  _inputHolder: function () {
     // if simple element (input, texatrea, select...) it will perfectly host the classes and precede the error container
-    if (!this.options.multiple || this.element.nodeName === 'SELECT')
+    if (!this.options.multiple || this.element.nodeName === "SELECT")
       return this.$element;
 
     // But if multiple element (radio, checkbox), that would be their parent
@@ -310,19 +341,23 @@ UI.Field = {
     if (0 !== this._ui.$errorsWrapper.parent().length)
       return this._ui.$errorsWrapper.parent();
 
-    if ('string' === typeof $errorsContainer) {
+    if ("string" === typeof $errorsContainer) {
       if ($($errorsContainer).length)
         return $($errorsContainer).append(this._ui.$errorsWrapper);
-      else if ('function' === typeof window[$errorsContainer])
+      else if ("function" === typeof window[$errorsContainer])
         $errorsContainer = window[$errorsContainer];
       else
-        Utils.warn('The errors container `' + $errorsContainer + '` does not exist in DOM nor as a global JS function');
+        Utils.warn(
+          "The errors container `" +
+            $errorsContainer +
+            "` does not exist in DOM nor as a global JS function"
+        );
     }
 
-    if ('function' === typeof $errorsContainer)
+    if ("function" === typeof $errorsContainer)
       $errorsContainer = $errorsContainer.call(this, this);
 
-    if ('object' === typeof $errorsContainer && $errorsContainer.length)
+    if ("object" === typeof $errorsContainer && $errorsContainer.length)
       return $errorsContainer.append(this._ui.$errorsWrapper);
 
     return this._inputHolder().after(this._ui.$errorsWrapper);
@@ -333,13 +368,18 @@ UI.Field = {
     var trigger;
 
     // Remove Parsley events already bound on this field
-    $toBind.off('.Parsley');
+    $toBind.off(".Parsley");
     if (this._failedOnce)
-      $toBind.on(Utils.namespaceEvents(this.options.triggerAfterFailure, 'Parsley'), () => {
-        this._validateIfNeeded();
-      });
-    else if (trigger = Utils.namespaceEvents(this.options.trigger, 'Parsley')) {
-      $toBind.on(trigger, event => {
+      $toBind.on(
+        Utils.namespaceEvents(this.options.triggerAfterFailure, "Parsley"),
+        () => {
+          this._validateIfNeeded();
+        }
+      );
+    else if (
+      (trigger = Utils.namespaceEvents(this.options.trigger, "Parsley"))
+    ) {
+      $toBind.on(trigger, (event) => {
         this._validateIfNeeded(event);
       });
     }
@@ -350,33 +390,35 @@ UI.Field = {
     // do not validate if val length < min threshold on first validation. Once field have been validated once and info
     // about success or failure have been displayed, always validate with this trigger to reflect every yalidation change.
     if (event && /key|input/.test(event.type))
-      if (!(this._ui && this._ui.validationInformationVisible) && this.getValue().length <= this.options.validationThreshold)
+      if (
+        !(this._ui && this._ui.validationInformationVisible) &&
+        this.getValue().length <= this.options.validationThreshold
+      )
         return;
 
     if (this.options.debounce) {
       window.clearTimeout(this._debounced);
-      this._debounced = window.setTimeout(() => this.validate(), this.options.debounce);
-    } else
-      this.validate();
+      this._debounced = window.setTimeout(
+        () => this.validate(),
+        this.options.debounce
+      );
+    } else this.validate();
   },
 
-  _resetUI: function () {
+  _resetUI: function (resetClass) {
+    if ("undefined" == typeof resetClass) resetClass = true;
     // Reset all event listeners
     this._failedOnce = false;
     this._actualizeTriggers();
 
     // Nothing to do if UI never initialized for this field
-    if ('undefined' === typeof this._ui)
-      return;
+    if ("undefined" === typeof this._ui) return;
 
     // Reset all errors' li
-    this._ui.$errorsWrapper
-      .removeClass('filled')
-      .children()
-      .remove();
+    this._ui.$errorsWrapper.removeClass("filled").children().remove();
 
     // Reset validation class
-    this._resetClass();
+    if (resetClass) this._resetClass();
 
     // Reset validation flags and last validation result
     this._ui.lastValidationResult = [];
@@ -386,23 +428,28 @@ UI.Field = {
   _destroyUI: function () {
     this._resetUI();
 
-    if ('undefined' !== typeof this._ui)
-      this._ui.$errorsWrapper.remove();
+    if ("undefined" !== typeof this._ui) this._ui.$errorsWrapper.remove();
 
     delete this._ui;
   },
 
   _successClass: function () {
     this._ui.validationInformationVisible = true;
-    this._ui.$errorClassHandler.removeClass(this.options.errorClass).addClass(this.options.successClass);
+    this._ui.$errorClassHandler
+      .removeClass(this.options.errorClass)
+      .addClass(this.options.successClass);
   },
   _errorClass: function () {
     this._ui.validationInformationVisible = true;
-    this._ui.$errorClassHandler.removeClass(this.options.successClass).addClass(this.options.errorClass);
+    this._ui.$errorClassHandler
+      .removeClass(this.options.successClass)
+      .addClass(this.options.errorClass);
   },
   _resetClass: function () {
-    this._ui.$errorClassHandler.removeClass(this.options.successClass).removeClass(this.options.errorClass);
-  }
+    this._ui.$errorClassHandler
+      .removeClass(this.options.successClass)
+      .removeClass(this.options.errorClass);
+  },
 };
 
 export default UI;
