@@ -48,7 +48,7 @@
     "gulp-cli": "^2.0.0",
     "gulp-eslint": "*",
     "gulp-git": "*",
-    "gulp-load-plugins": "^0.10.0",
+    "gulp-load-plugins": "^2.0.4",
     "gulp-mocha": "*",
     "gulp-replace": "*",
     "inputevent": "*",
@@ -58,7 +58,6 @@
     "rollup": "*",
     "rollup-plugin-babel": "*",
     "rollup-plugin-replace": "*",
-    "rollup-plugin-uglify": "*",
     "sinon": "^1.12.2"
   },
   "jspm": {

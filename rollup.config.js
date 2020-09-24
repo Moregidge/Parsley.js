@@ -1,7 +1,6 @@
-import {rollupOptions} from './tools/rollup_options.js';
-import {uglify} from 'rollup-plugin-uglify';
+import { rollupOptions } from "./tools/rollup_options.js";
 
 export default [
   rollupOptions({}),
-  rollupOptions({suffix: '.min', extraPlugins: [uglify()]}),
+  rollupOptions({ suffix: ".min", extraPlugins: [] }),
 ];

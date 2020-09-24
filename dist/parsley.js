@@ -1,6 +1,6 @@
 /*!
 * Parsley.js
-* Version 2.9.2 - built Tue, Dec 10th 2019, 6:18 pm
+* Version 2.9.2 - built Thu, Sep 24th 2020, 12:06 am
 * http://parsleyjs.org
 * Guillaume Potier - <guillaume@wisembly.com>
 * Marc-Andre Lafortune - <petroselinum@marc-andre.ca>
@@ -14,10 +14,12 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('jquery')) :
   typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-  (global = global || self, global.parsley = factory(global.jQuery));
+  (global.parsley = factory(global.jQuery));
 }(this, (function ($) { 'use strict';
 
   function _typeof(obj) {
+    "@babel/helpers - typeof";
+
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
       _typeof = function (obj) {
         return typeof obj;
@@ -50,19 +52,15 @@
   }
 
   function _slicedToArray(arr, i) {
-    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
   }
 
   function _toConsumableArray(arr) {
-    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
   }
 
   function _arrayWithoutHoles(arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-      return arr2;
-    }
+    if (Array.isArray(arr)) return _arrayLikeToArray(arr);
   }
 
   function _arrayWithHoles(arr) {
@@ -70,14 +68,11 @@
   }
 
   function _iterableToArray(iter) {
-    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+    if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
   }
 
   function _iterableToArrayLimit(arr, i) {
-    if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
-      return;
-    }
-
+    if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
     var _arr = [];
     var _n = true;
     var _d = false;
@@ -103,12 +98,29 @@
     return _arr;
   }
 
+  function _unsupportedIterableToArray(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(o);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+  }
+
+  function _arrayLikeToArray(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+
+    for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+    return arr2;
+  }
+
   function _nonIterableSpread() {
-    throw new TypeError("Invalid attempt to spread non-iterable instance");
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
   function _nonIterableRest() {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
   var globalID = 1;
@@ -918,26 +930,26 @@
     _actualizeTriggers: function _actualizeTriggers() {
       var _this = this;
 
-      this.$element.on('submit.Parsley', function (evt) {
+      this.$element.on("submit.Parsley", function (evt) {
         _this.onSubmitValidate(evt);
       });
-      this.$element.on('click.Parsley', Utils._SubmitSelector, function (evt) {
+      this.$element.on("click.Parsley", Utils._SubmitSelector, function (evt) {
         _this.onSubmitButton(evt);
       }); // UI could be disabled
 
       if (false === this.options.uiEnabled) return;
-      this.element.setAttribute('novalidate', '');
+      this.element.setAttribute("novalidate", "");
     },
     focus: function focus() {
       this._focusedField = null;
-      if (true === this.validationResult || 'none' === this.options.focus) return null;
+      if (true === this.validationResult || "none" === this.options.focus) return null;
 
       for (var i = 0; i < this.fields.length; i++) {
         var field = this.fields[i];
 
-        if (true !== field.validationResult && field.validationResult.length > 0 && 'undefined' === typeof field.options.noFocus) {
+        if (true !== field.validationResult && field.validationResult.length > 0 && "undefined" === typeof field.options.noFocus) {
           this._focusedField = field.$element;
-          if ('first' === this.options.focus) break;
+          if ("first" === this.options.focus) break;
         }
       }
 
@@ -946,7 +958,7 @@
     },
     _destroyUI: function _destroyUI() {
       // Reset all event listeners
-      this.$element.off('.Parsley');
+      this.$element.off(".Parsley");
     }
   };
   UI.Field = {
@@ -1036,25 +1048,25 @@
       if (updateClass) this._manageStatusClass();
     },
     _manageStatusClass: function _manageStatusClass() {
-      if (this.hasConstraints() && this.needsValidation() && true === this.validationResult) this._successClass();else if (this.validationResult.length > 0) this._errorClass();else this._resetClass();
+      if (this.needsValidation() && true === this.validationResult) this._successClass();else if (this.validationResult.length > 0) this._errorClass();else this._resetClass();
     },
     _manageErrorsMessages: function _manageErrorsMessages(diff) {
-      if ('undefined' !== typeof this.options.errorsMessagesDisabled) return; // Case where we have errorMessage option that configure an unique field error message, regardless failing validators
+      if ("undefined" !== typeof this.options.errorsMessagesDisabled) return; // Case where we have errorMessage option that configure an unique field error message, regardless failing validators
 
-      if ('undefined' !== typeof this.options.errorMessage) {
+      if ("undefined" !== typeof this.options.errorMessage) {
         if (diff.added.length || diff.kept.length) {
           this._insertErrorWrapper();
 
-          if (0 === this._ui.$errorsWrapper.find('.parsley-custom-error-message').length) this._ui.$errorsWrapper.append($(this.options.errorTemplate).addClass('parsley-custom-error-message'));
+          if (0 === this._ui.$errorsWrapper.find(".parsley-custom-error-message").length) this._ui.$errorsWrapper.append($(this.options.errorTemplate).addClass("parsley-custom-error-message"));
 
-          this._ui.$errorClassHandler.attr('aria-describedby', this._ui.errorsWrapperId);
+          this._ui.$errorClassHandler.attr("aria-describedby", this._ui.errorsWrapperId);
 
-          return this._ui.$errorsWrapper.addClass('filled').attr('aria-hidden', 'false').find('.parsley-custom-error-message').html(this.options.errorMessage);
+          return this._ui.$errorsWrapper.addClass("filled").attr("aria-hidden", "false").find(".parsley-custom-error-message").html(this.options.errorMessage);
         }
 
-        this._ui.$errorClassHandler.removeAttr('aria-describedby');
+        this._ui.$errorClassHandler.removeAttr("aria-describedby");
 
-        return this._ui.$errorsWrapper.removeClass('filled').attr('aria-hidden', 'true').find('.parsley-custom-error-message').remove();
+        return this._ui.$errorsWrapper.removeClass("filled").attr("aria-hidden", "true").find(".parsley-custom-error-message").remove();
       } // Show, hide, update failing constraints messages
 
 
@@ -1082,24 +1094,24 @@
 
       this._insertErrorWrapper();
 
-      this._ui.$errorClassHandler.attr('aria-describedby', this._ui.errorsWrapperId);
+      this._ui.$errorClassHandler.attr("aria-describedby", this._ui.errorsWrapperId);
 
-      this._ui.$errorsWrapper.addClass('filled').attr('aria-hidden', 'false').append($(this.options.errorTemplate).addClass('parsley-' + name).html(message || this._getErrorMessage(assert)));
+      this._ui.$errorsWrapper.addClass("filled").attr("aria-hidden", "false").append($(this.options.errorTemplate).addClass("parsley-" + name).html(message || this._getErrorMessage(assert)));
     },
     _updateError: function _updateError(name, _ref5) {
       var message = _ref5.message,
           assert = _ref5.assert;
 
-      this._ui.$errorsWrapper.addClass('filled').find('.parsley-' + name).html(message || this._getErrorMessage(assert));
+      this._ui.$errorsWrapper.addClass("filled").find(".parsley-" + name).html(message || this._getErrorMessage(assert));
     },
     _removeError: function _removeError(name) {
-      this._ui.$errorClassHandler.removeAttr('aria-describedby');
+      this._ui.$errorClassHandler.removeAttr("aria-describedby");
 
-      this._ui.$errorsWrapper.removeClass('filled').attr('aria-hidden', 'true').find('.parsley-' + name).remove();
+      this._ui.$errorsWrapper.removeClass("filled").attr("aria-hidden", "true").find(".parsley-" + name).remove();
     },
     _getErrorMessage: function _getErrorMessage(constraint) {
-      var customConstraintErrorMessage = constraint.name + 'Message';
-      if ('undefined' !== typeof this.options[customConstraintErrorMessage]) return window.Parsley.formatMessage(this.options[customConstraintErrorMessage], constraint.requirements);
+      var customConstraintErrorMessage = constraint.name + "Message";
+      if ("undefined" !== typeof this.options[customConstraintErrorMessage]) return window.Parsley.formatMessage(this.options[customConstraintErrorMessage], constraint.requirements);
       return window.Parsley.getErrorMessage(constraint);
     },
     _buildUI: function _buildUI() {
@@ -1107,14 +1119,14 @@
       if (this._ui || false === this.options.uiEnabled) return;
       var _ui = {}; // Give field its Parsley id in DOM
 
-      this.element.setAttribute(this.options.namespace + 'id', this.__id__);
+      this.element.setAttribute(this.options.namespace + "id", this.__id__);
       /** Generate important UI elements and store them in this **/
       // $errorClassHandler is the $element that woul have parsley-error and parsley-success classes
 
       _ui.$errorClassHandler = this._manageClassHandler(); // $errorsWrapper is a div that would contain the various field errors, it will be appended into $errorsContainer
 
-      _ui.errorsWrapperId = 'parsley-id-' + (this.options.multiple ? 'multiple-' + this.options.multiple : this.__id__);
-      _ui.$errorsWrapper = $(this.options.errorsWrapper).attr('id', _ui.errorsWrapperId); // ValidationResult UI storage to detect what have changed bwt two validations, and update DOM accordingly
+      _ui.errorsWrapperId = "parsley-id-" + (this.options.multiple ? "multiple-" + this.options.multiple : this.__id__);
+      _ui.$errorsWrapper = $(this.options.errorsWrapper).attr("id", _ui.errorsWrapperId); // ValidationResult UI storage to detect what have changed bwt two validations, and update DOM accordingly
 
       _ui.lastValidationResult = [];
       _ui.validationInformationVisible = false; // Store it in this for later
@@ -1124,27 +1136,27 @@
     // Determine which element will have `parsley-error` and `parsley-success` classes
     _manageClassHandler: function _manageClassHandler() {
       // Class handled could also be determined by function given in Parsley options
-      if ('string' === typeof this.options.classHandler && $(this.options.classHandler).length) return $(this.options.classHandler); // Class handled could also be determined by function given in Parsley options
+      if ("string" === typeof this.options.classHandler && $(this.options.classHandler).length) return $(this.options.classHandler); // Class handled could also be determined by function given in Parsley options
 
       var $handlerFunction = this.options.classHandler; // It might also be the function name of a global function
 
-      if ('string' === typeof this.options.classHandler && 'function' === typeof window[this.options.classHandler]) $handlerFunction = window[this.options.classHandler];
+      if ("string" === typeof this.options.classHandler && "function" === typeof window[this.options.classHandler]) $handlerFunction = window[this.options.classHandler];
 
-      if ('function' === typeof $handlerFunction) {
+      if ("function" === typeof $handlerFunction) {
         var $handler = $handlerFunction.call(this, this); // If this function returned a valid existing DOM element, go for it
 
-        if ('undefined' !== typeof $handler && $handler.length) return $handler;
-      } else if ('object' === _typeof($handlerFunction) && $handlerFunction instanceof jQuery && $handlerFunction.length) {
+        if ("undefined" !== typeof $handler && $handler.length) return $handler;
+      } else if ("object" === _typeof($handlerFunction) && $handlerFunction instanceof jQuery && $handlerFunction.length) {
         return $handlerFunction;
       } else if ($handlerFunction) {
-        Utils.warn('The class handler `' + $handlerFunction + '` does not exist in DOM nor as a global JS function');
+        Utils.warn("The class handler `" + $handlerFunction + "` does not exist in DOM nor as a global JS function");
       }
 
       return this._inputHolder();
     },
     _inputHolder: function _inputHolder() {
       // if simple element (input, texatrea, select...) it will perfectly host the classes and precede the error container
-      if (!this.options.multiple || this.element.nodeName === 'SELECT') return this.$element; // But if multiple element (radio, checkbox), that would be their parent
+      if (!this.options.multiple || this.element.nodeName === "SELECT") return this.$element; // But if multiple element (radio, checkbox), that would be their parent
 
       return this.$element.parent();
     },
@@ -1153,12 +1165,12 @@
 
       if (0 !== this._ui.$errorsWrapper.parent().length) return this._ui.$errorsWrapper.parent();
 
-      if ('string' === typeof $errorsContainer) {
-        if ($($errorsContainer).length) return $($errorsContainer).append(this._ui.$errorsWrapper);else if ('function' === typeof window[$errorsContainer]) $errorsContainer = window[$errorsContainer];else Utils.warn('The errors container `' + $errorsContainer + '` does not exist in DOM nor as a global JS function');
+      if ("string" === typeof $errorsContainer) {
+        if ($($errorsContainer).length) return $($errorsContainer).append(this._ui.$errorsWrapper);else if ("function" === typeof window[$errorsContainer]) $errorsContainer = window[$errorsContainer];else Utils.warn("The errors container `" + $errorsContainer + "` does not exist in DOM nor as a global JS function");
       }
 
-      if ('function' === typeof $errorsContainer) $errorsContainer = $errorsContainer.call(this, this);
-      if ('object' === _typeof($errorsContainer) && $errorsContainer.length) return $errorsContainer.append(this._ui.$errorsWrapper);
+      if ("function" === typeof $errorsContainer) $errorsContainer = $errorsContainer.call(this, this);
+      if ("object" === _typeof($errorsContainer) && $errorsContainer.length) return $errorsContainer.append(this._ui.$errorsWrapper);
       return this._inputHolder().after(this._ui.$errorsWrapper);
     },
     _actualizeTriggers: function _actualizeTriggers() {
@@ -1168,10 +1180,10 @@
 
       var trigger; // Remove Parsley events already bound on this field
 
-      $toBind.off('.Parsley');
-      if (this._failedOnce) $toBind.on(Utils.namespaceEvents(this.options.triggerAfterFailure, 'Parsley'), function () {
+      $toBind.off(".Parsley");
+      if (this._failedOnce) $toBind.on(Utils.namespaceEvents(this.options.triggerAfterFailure, "Parsley"), function () {
         _this2._validateIfNeeded();
-      });else if (trigger = Utils.namespaceEvents(this.options.trigger, 'Parsley')) {
+      });else if (trigger = Utils.namespaceEvents(this.options.trigger, "Parsley")) {
         $toBind.on(trigger, function (event) {
           _this2._validateIfNeeded(event);
         });
@@ -1192,20 +1204,20 @@
         }, this.options.debounce);
       } else this.validate();
     },
-    _resetUI: function _resetUI() {
-      // Reset all event listeners
+    _resetUI: function _resetUI(resetClass) {
+      if ("undefined" == typeof resetClass) resetClass = true; // Reset all event listeners
+
       this._failedOnce = false;
 
       this._actualizeTriggers(); // Nothing to do if UI never initialized for this field
 
 
-      if ('undefined' === typeof this._ui) return; // Reset all errors' li
+      if ("undefined" === typeof this._ui) return; // Reset all errors' li
 
-      this._ui.$errorsWrapper.removeClass('filled').children().remove(); // Reset validation class
+      this._ui.$errorsWrapper.removeClass("filled").children().remove(); // Reset validation class
 
 
-      this._resetClass(); // Reset validation flags and last validation result
-
+      if (resetClass) this._resetClass(); // Reset validation flags and last validation result
 
       this._ui.lastValidationResult = [];
       this._ui.validationInformationVisible = false;
@@ -1213,7 +1225,7 @@
     _destroyUI: function _destroyUI() {
       this._resetUI();
 
-      if ('undefined' !== typeof this._ui) this._ui.$errorsWrapper.remove();
+      if ("undefined" !== typeof this._ui) this._ui.$errorsWrapper.remove();
       delete this._ui;
     },
     _successClass: function _successClass() {
@@ -1232,7 +1244,7 @@
   };
 
   var Form = function Form(element, domOptions, options) {
-    this.__class__ = 'Form';
+    this.__class__ = "Form";
     this.element = element;
     this.$element = $(element);
     this.domOptions = domOptions;
@@ -1256,18 +1268,18 @@
 
       var submitSource = this._submitSource || this.$element.find(Utils._SubmitSelector)[0];
       this._submitSource = null;
-      this.$element.find('.parsley-synthetic-submit-button').prop('disabled', true);
-      if (submitSource && null !== submitSource.getAttribute('formnovalidate')) return;
+      this.$element.find(".parsley-synthetic-submit-button").prop("disabled", true);
+      if (submitSource && null !== submitSource.getAttribute("formnovalidate")) return;
       window.Parsley._remoteCache = {};
       var promise = this.whenValidate({
         event: event
       });
 
-      if ('resolved' === promise.state() && false !== this._trigger('submit')) ; else {
+      if ("resolved" === promise.state() && false !== this._trigger("submit")) ; else {
         // Rejected or pending: cancel this submit
         event.stopImmediatePropagation();
         event.preventDefault();
-        if ('pending' === promise.state()) promise.done(function () {
+        if ("pending" === promise.state()) promise.done(function () {
           _this._submit(submitSource);
         });
       }
@@ -1279,18 +1291,18 @@
     // _submit submits the form, this time without going through the validations.
     // Care must be taken to "fake" the actual submit button being clicked.
     _submit: function _submit(submitSource) {
-      if (false === this._trigger('submit')) return; // Add submit button's data
+      if (false === this._trigger("submit")) return; // Add submit button's data
 
       if (submitSource) {
-        var $synthetic = this.$element.find('.parsley-synthetic-submit-button').prop('disabled', false);
+        var $synthetic = this.$element.find(".parsley-synthetic-submit-button").prop("disabled", false);
         if (0 === $synthetic.length) $synthetic = $('<input class="parsley-synthetic-submit-button" type="hidden">').appendTo(this.$element);
         $synthetic.attr({
-          name: submitSource.getAttribute('name'),
-          value: submitSource.getAttribute('value')
+          name: submitSource.getAttribute("name"),
+          value: submitSource.getAttribute("value")
         });
       }
 
-      this.$element.trigger(_extends($.Event('submit'), {
+      this.$element.trigger(_extends($.Event("submit"), {
         parsley: true
       }));
     },
@@ -1301,7 +1313,7 @@
     // Consider using `whenValidate` instead.
     validate: function validate(options) {
       if (arguments.length >= 1 && !$.isPlainObject(options)) {
-        Utils.warnOnce('Calling validate on a parsley form without passing arguments as an object is deprecated.');
+        Utils.warnOnce("Calling validate on a parsley form without passing arguments as an object is deprecated.");
 
         var _arguments = Array.prototype.slice.call(arguments),
             group = _arguments[0],
@@ -1339,7 +1351,7 @@
 
       this.validationResult = true; // fire validate event to eventually modify things before every validation
 
-      this._trigger('validate'); // Refresh form DOM options and form's fields that could have changed
+      this._trigger("validate"); // Refresh form DOM options and form's fields that could have changed
 
 
       this._refreshFields();
@@ -1354,15 +1366,15 @@
       });
 
       return (_Utils$all$done$fail$ = Utils.all(promises).done(function () {
-        _this2._trigger('success');
+        _this2._trigger("success");
       }).fail(function () {
         _this2.validationResult = false;
 
         _this2.focus();
 
-        _this2._trigger('error');
+        _this2._trigger("error");
       }).always(function () {
-        _this2._trigger('validated');
+        _this2._trigger("validated");
       })).pipe.apply(_Utils$all$done$fail$, _toConsumableArray(this._pipeAccordingToValidationResult()));
     },
     // Iterate over refreshed fields, and stop on first failure.
@@ -1371,7 +1383,7 @@
     // Prefer using `whenValid` instead.
     isValid: function isValid(options) {
       if (arguments.length >= 1 && !$.isPlainObject(options)) {
-        Utils.warnOnce('Calling isValid on a parsley form without passing arguments as an object is deprecated.');
+        Utils.warnOnce("Calling isValid on a parsley form without passing arguments as an object is deprecated.");
 
         var _arguments2 = Array.prototype.slice.call(arguments),
             group = _arguments2[0],
@@ -1414,13 +1426,13 @@
       return this;
     },
     // Reset UI
-    reset: function reset() {
+    reset: function reset(resetClass) {
       // Form case: emit a reset event for each field
       for (var i = 0; i < this.fields.length; i++) {
-        this.fields[i].reset();
+        this.fields[i].reset(resetClass);
       }
 
-      this._trigger('reset');
+      this._trigger("reset");
     },
     // Destroy Parsley instance (+ UI)
     destroy: function destroy() {
@@ -1432,9 +1444,9 @@
         this.fields[i].destroy();
       }
 
-      this.$element.removeData('Parsley');
+      this.$element.removeData("Parsley");
 
-      this._trigger('destroy');
+      this._trigger("destroy");
     },
     _refreshFields: function _refreshFields() {
       return this.actualizeOptions()._bindFields();
@@ -1450,10 +1462,10 @@
         _this4.$element.find(_this4.options.inputs).not(_this4.options.excluded).not("[".concat(_this4.options.namespace, "excluded=true]")).each(function (_, element) {
           var fieldInstance = new window.Parsley.Factory(element, {}, _this4); // Only add valid and not excluded `Field` and `FieldMultiple` children
 
-          if ('Field' === fieldInstance.__class__ || 'FieldMultiple' === fieldInstance.__class__) {
-            var uniqueId = fieldInstance.__class__ + '-' + fieldInstance.__id__;
+          if ("Field" === fieldInstance.__class__ || "FieldMultiple" === fieldInstance.__class__) {
+            var uniqueId = fieldInstance.__class__ + "-" + fieldInstance.__id__;
 
-            if ('undefined' === typeof _this4.fieldsMappedById[uniqueId]) {
+            if ("undefined" === typeof _this4.fieldsMappedById[uniqueId]) {
               _this4.fieldsMappedById[uniqueId] = fieldInstance;
 
               _this4.fields.push(fieldInstance);
@@ -1490,7 +1502,7 @@
     // Shortcut to trigger an event
     // Returns true iff event is not interrupted and default not prevented.
     _trigger: function _trigger(eventName) {
-      return this.trigger('form:' + eventName);
+      return this.trigger("form:" + eventName);
     }
   };
 
@@ -1720,8 +1732,8 @@
       return this._handleWhitespace(value);
     },
     // Reset UI
-    reset: function reset() {
-      this._resetUI();
+    reset: function reset(resetClass) {
+      this._resetUI(resetClass);
 
       return this._trigger('reset');
     },
